@@ -1,0 +1,127 @@
+/*==============================================================*/
+/* DBMS name:      Microsoft SQL Server 2014                    */
+/* Created on:     18/11/2023 13:22:06                          */
+/*==============================================================*/
+
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('ESTUDANTE') and o.name = 'FK_ESTUDANT_ESTUDANTE_MORADA')
+alter table ESTUDANTE
+   drop constraint FK_ESTUDANT_ESTUDANTE_MORADA
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('ESTUDANTE') and o.name = 'FK_ESTUDANT_PROVENIEN_PROVENIE')
+alter table ESTUDANTE
+   drop constraint FK_ESTUDANT_PROVENIEN_PROVENIE
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('ESTUDANTE')
+            and   name  = 'ESTUDANTE_MORADA_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index ESTUDANTE.ESTUDANTE_MORADA_FK
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('ESTUDANTE')
+            and   name  = 'PROVENIENCIA_ESTUDANTE_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index ESTUDANTE.PROVENIENCIA_ESTUDANTE_FK
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('ESTUDANTE')
+            and   type = 'U')
+   drop table ESTUDANTE
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('MORADA')
+            and   type = 'U')
+   drop table MORADA
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('PROVENIENCIA')
+            and   type = 'U')
+   drop table PROVENIENCIA
+go
+
+/*==============================================================*/
+/* Table: ESTUDANTE                                             */
+/*==============================================================*/
+create table ESTUDANTE (
+   ID_ESTUDANTE         numeric(25)          not null,
+   ID_PROVENIENCIA      numeric(25)          not null,
+   ID_MORADA            numeric(15)          not null,
+   NOME                 char(40)             not null,
+   constraint PK_ESTUDANTE primary key (ID_ESTUDANTE)
+)
+go
+
+/*==============================================================*/
+/* Index: PROVENIENCIA_ESTUDANTE_FK                             */
+/*==============================================================*/
+
+
+
+
+create nonclustered index PROVENIENCIA_ESTUDANTE_FK on ESTUDANTE (ID_PROVENIENCIA ASC)
+go
+
+/*==============================================================*/
+/* Index: ESTUDANTE_MORADA_FK                                   */
+/*==============================================================*/
+
+
+
+
+create nonclustered index ESTUDANTE_MORADA_FK on ESTUDANTE (ID_MORADA ASC)
+go
+
+/*==============================================================*/
+/* Table: MORADA                                                */
+/*==============================================================*/
+create table MORADA (
+   ID_MORADA            numeric(15)          not null,
+   PAIS                 char(25)             not null,
+   PROVINCIA            char(30)             not null,
+   MUNICIPIO            char(25)             not null,
+   DISTRITO             char(25)             not null,
+   RUA                  char(25)             not null,
+   constraint PK_MORADA primary key (ID_MORADA)
+)
+go
+
+/*==============================================================*/
+/* Table: PROVENIENCIA                                          */
+/*==============================================================*/
+create table PROVENIENCIA (
+   ID_PROVENIENCIA      numeric(25)          not null,
+   NACIONALIDADE        char(25)             not null,
+   NATURALIDADE         char(30)             not null,
+   HOSPITALNASCENCA     char(40)             not null,
+   constraint PK_PROVENIENCIA primary key (ID_PROVENIENCIA)
+)
+go
+
+alter table ESTUDANTE
+   add constraint FK_ESTUDANT_ESTUDANTE_MORADA foreign key (ID_MORADA)
+      references MORADA (ID_MORADA)
+go
+
+alter table ESTUDANTE
+   add constraint FK_ESTUDANT_PROVENIEN_PROVENIE foreign key (ID_PROVENIENCIA)
+      references PROVENIENCIA (ID_PROVENIENCIA)
+go
+
